@@ -1,0 +1,13 @@
+#way to ignore executables without extensions
+#ignore all
+* 
+#do not ignore all files with extension
+!*.*
+#do not ignore all directories
+!*/
+
+#ignore object files
+*.o
+
+#ignore user files
+#*.user
