@@ -13,8 +13,12 @@ public:
     void rotateCamera(float pitch, float yaw);
     void updateView();
     void changeProjection(float yOffset);
-    glm::mat4 getView();
+    glm::mat4 getProjection(float screenWidth, float screenHeight);
+    glm::mat4 getView() const;
+    glm::vec3 getCameraPosition() const;
+private:
     glm::mat4 view;
+    glm::mat4 projection;
     glm::vec3 cameraPosition;
     glm::vec3 cameraTarget;
     glm::vec3 up;

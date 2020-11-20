@@ -5,6 +5,7 @@ Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 up) :
     view = glm::lookAt(cameraPosition, cameraPosition + cameraTarget, up);
     yaw = 0;
     pitch = 0;
+    fov = 45;
 }
 
 void Camera::forwardBackwardMove(float speed)
@@ -43,12 +44,26 @@ void Camera::changeProjection(float yOffset)
         fov = 1.0f;
     if (fov > 45.0f)
         fov = 45.0f;
+
+}
+
+glm::mat4 Camera::getProjection(float screenWidth, float screenHeight)
+{
+    projection = glm::perspective(glm::radians(fov), screenWidth / screenHeight, 1.0f, 50.0f);
+    return projection;
 }
 
 
 
-glm::mat4 Camera::getView()
+glm::mat4 Camera::getView() const
 {
     return view;
 }
+
+glm::vec3 Camera::getCameraPosition() const
+{
+    return cameraPosition;
+}
+
+
 

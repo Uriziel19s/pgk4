@@ -42,9 +42,11 @@ public:
         : AGLWindow(_wd, _ht, name, vers, fullscr) {};
     virtual void KeyCB(int key, int scancode, int action, int mods);
     void MainLoop(const int seed, const unsigned int dimensions);
-    Camera camera{glm::vec3(0.0f, 0.0f, 0.0f),
+    void ScrollCB(double xp, double yp);
+    Camera camera{glm::vec3(-5.0f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f)};
+
 };
 
 
@@ -65,12 +67,16 @@ void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 
 }
 
+
+void MyWin::ScrollCB(double xp, double yp)
+{
+    camera.changeProjection(yp);
+}
+
 // ==========================================================================
 void MyWin::MainLoop(const int seed, const unsigned int dimensions) {
-    ViewportOne(0,0,wd,ht);
+    ViewportOne(0, 0, wd, ht);
     myShape shapes(10, 0);
-    //BackgroundRectangle background(-1, 1, 1, -1);
-  //  glfwSetScrollCallback(win, scrollCallback);
     float speed = 0.4;
     do {
         glClear( GL_COLOR_BUFFER_BIT );
@@ -79,7 +85,8 @@ void MyWin::MainLoop(const int seed, const unsigned int dimensions) {
         // =====================================================        Drawing
         camera.updateView();
        // background.draw(0,0,2, camera.getView());
-        shapes.draw(0, 0, 0, camera.getView());
+        shapes.isCollision(camera.getCameraPosition(), 0.3);
+        shapes.draw(0, 0, 0.5, camera.getView(), camera.getProjection(wd, ht));
         AGLErrors("main-afterdraw");
         WaitForFixedFPS(1.0/60);
         glfwSwapBuffers(win()); // =============================   Swap buffers
@@ -97,9 +104,9 @@ void MyWin::MainLoop(const int seed, const unsigned int dimensions) {
         } if (glfwGetKey(win(), GLFW_KEY_LEFT ) == GLFW_PRESS) {
             camera.rotateCamera(0,-speed);
         } if (glfwGetKey(win(), GLFW_KEY_W ) == GLFW_PRESS) {
-                camera.forwardBackwardMove(-speed*0.1);
+                camera.forwardBackwardMove(-speed);
         } if (glfwGetKey(win(), GLFW_KEY_S ) == GLFW_PRESS) {
-            camera.forwardBackwardMove(speed*0.1);
+            camera.forwardBackwardMove(speed);
         } if (glfwGetKey(win(), GLFW_KEY_A ) == GLFW_PRESS) {
 
         } if (glfwGetKey(win(), GLFW_KEY_D ) == GLFW_PRESS) {

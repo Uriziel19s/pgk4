@@ -1,9 +1,10 @@
-#ifndef _AGL3WINDOW_HPP_
-#define _AGL3WINDOW_HPP_
+#ifndef AGL3WINDOW_H
+#define AGL3WINDOW_H
 // ==========================================================================
 // AGL3:  GL/GLFW init AGLWindow and AGLDrawable class definitions
 //
 // Ver.3  14.I.2020 (c) A. Łukaszewski
+// refactoring W. Strak 18.11.2020
 // ==========================================================================
 // AGLWindow
 //===========================================================================
@@ -17,12 +18,14 @@ void AGLErrors(const char *comment); // Prints  Comment and error
 
 class AGLWindow {
 public:
-   AGLWindow(){};
-   AGLWindow(int _wd, int _ht, const char *name, int fullscr=0, int vers=33)
-   {  Init(_wd,_ht,name,vers,fullscr);  };          // fullscr=1/2 vers=33
+   AGLWindow(){}
+   AGLWindow(int _wd, int _ht, const char *name, int fullscr = 0, int vers = 33)
+   {
+       Init(_wd,_ht,name,vers,fullscr);
+   }          // fullscr=1/2 vers=33
    void Init(int _wd, int _ht, const char *name, int fullscr=0, int vers=33);
-   ~AGLWindow();
-   GLFWwindow* win() {  return window;  };
+   virtual ~AGLWindow();
+   GLFWwindow* win() {  return window;  }
 
    int   wd,ht;                                       // Window dimensions
    float aspect;                                      // Window aspect ration
@@ -32,34 +35,34 @@ public:
    void  GetCursorNDC(float *x, float *y);            // mouse position VpOne
 
    // Handles key 'f' for switching fullscreen mode:
-   virtual void Resize( int posx, int poy, int _wd, int _ht ); // Sets Win:wd,ht,aspec +glViewp
+   virtual void Resize(int posx, int poy, int _wd, int _ht); // Sets Win:wd,ht,aspec +glViewp
    virtual void KeyCB(int key, int scancode, int action, int mods);
    virtual void MouseButtonCB(int button,    int action, int mods);
    virtual void ScrollCB(double xp, double yp);
    virtual void MousePosCB(double xp, double yp);
 
-   void MainLoop ( void );
+   void MainLoop();
    
-   void WaitForFixedFPS(float frame_time=1./60.); // Use before glfwSwapBuffers()
+   void WaitForFixedFPS(float frame_time = 1.0f / 60.0f); // Use before glfwSwapBuffers()
 //===========================================================================
 
 private:
-   bool IsFullScreen(  void );
-   void SetFullScreen( bool fullscreen );
+   bool IsFullScreen();
+   void SetFullScreen(bool fullscreen);
 
    int vtx, vty, vwd, vht; // GtCursorNDC() and ViewportOne()
 
    // vers=33 for GLSL 3.3, fullscr=0 for window or 1/2 for FullScr 1/2 monitor
-   GLFWwindow  *        window         = nullptr;
-   GLFWmonitor *        monitor        = nullptr;
-   std::array< int, 2 > winPos         = {0, 0};
-   std::array< int, 2 > winSize        = {0, 0};
+   GLFWwindow*          window         = nullptr;
+   GLFWmonitor*         monitor        = nullptr;
+   std::array<int, 2>   winPos         = {0, 0};
+   std::array<int, 2>   winSize        = {0, 0};
 
-   std::array< int, 2 > vwpSize        = {0, 0};
+   std::array<int, 2>   vwpSize        = {0, 0};
    bool                 updateViewport = true;
-   std::array<GLFWmonitor *,2> monitors= {nullptr, nullptr}; // first and last m.
+   std::array<GLFWmonitor*, 2> monitors= {nullptr, nullptr}; // first and last m.
 
-   double prev_time=0.0; // for fixed FPS
+   double prev_time = 0.0; // for fixed FPS
    
    static void CallbackResize(GLFWwindow* window, int cx, int cy);
    static void CallbackKey(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -67,4 +70,5 @@ private:
    static void CallbackScroll(GLFWwindow* window, double xp, double yp);
    static void CallbackMousePos(GLFWwindow* window, double xp, double yp);
 };
+
 #endif
