@@ -23,4 +23,5 @@ HEADERS += \
     camera.h \
     myshape.h \
     myShape.vs \
-    myShape.fs
+    myShape.fs \
+    triangle.h

@@ -2,10 +2,13 @@
 
 Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 up) : cameraPosition(cameraPosition), cameraTarget(cameraTarget), up(up), worldUp(up)
 {
-    view = glm::lookAt(cameraPosition, cameraPosition + cameraTarget, up);
-    yaw = 0;
+    yaw = 120;
     pitch = 0;
     fov = 45;
+    rotateCamera(0, 0);
+    view = glm::lookAt(cameraPosition, cameraPosition + cameraTarget, up);
+
+
 }
 
 void Camera::forwardBackwardMove(float speed)

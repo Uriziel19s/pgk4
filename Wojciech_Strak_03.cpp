@@ -43,7 +43,8 @@ public:
     virtual void KeyCB(int key, int scancode, int action, int mods);
     void MainLoop(const int seed, const unsigned int dimensions);
     void ScrollCB(double xp, double yp);
-    Camera camera{glm::vec3(-5.0f, 0.0f, 0.0f),
+    void MousePosCB(double xp, double yp);
+    Camera camera{glm::vec3(0.0f, 5.0f, 0.0f),
                   glm::vec3(0.0f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f)};
 
@@ -62,15 +63,16 @@ void MyWin::KeyCB(int key, int scancode, int action, int mods) {
     }
 }
 
-void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
-{
-
-}
 
 
 void MyWin::ScrollCB(double xp, double yp)
 {
     camera.changeProjection(yp);
+}
+
+void MyWin::MousePosCB(double xp, double yp)
+{
+
 }
 
 // ==========================================================================
@@ -85,7 +87,7 @@ void MyWin::MainLoop(const int seed, const unsigned int dimensions) {
         // =====================================================        Drawing
         camera.updateView();
        // background.draw(0,0,2, camera.getView());
-        shapes.isCollision(camera.getCameraPosition(), 0.3);
+        shapes.isCollision(camera.getCameraPosition(), 4);
         shapes.draw(0, 0, 0.5, camera.getView(), camera.getProjection(wd, ht));
         AGLErrors("main-afterdraw");
         WaitForFixedFPS(1.0/60);
@@ -110,7 +112,7 @@ void MyWin::MainLoop(const int seed, const unsigned int dimensions) {
         } if (glfwGetKey(win(), GLFW_KEY_A ) == GLFW_PRESS) {
 
         } if (glfwGetKey(win(), GLFW_KEY_D ) == GLFW_PRESS) {
-        std::cout << glm::to_string(camera.getView()) << std::endl;
+        std::cout << glm::to_string(camera.getCameraPosition()) << std::endl;
 
         }
     } while( glfwGetKey(win(), GLFW_KEY_ESCAPE ) != GLFW_PRESS &&

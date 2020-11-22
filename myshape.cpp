@@ -1,4 +1,4 @@
-#include "myshape.h"
+﻿#include "myshape.h"
 
 myShape::myShape(unsigned int dimensions, int seed) : kDimensions(dimensions), engine(std::random_device()())
 {
@@ -7,18 +7,15 @@ myShape::myShape(unsigned int dimensions, int seed) : kDimensions(dimensions), e
         engine.seed(static_cast<unsigned long>(seed));
     }
     setShaders();
-    setMidpoints(-10, -10, -10, 10);
+    setMidpoints(-15, -15, 15, 15);
     setRotations();
     setScales();
     setBuffers();
-
+    setTriangleCache();
 }
 
 void myShape::setMidpoints(float xStart, float yStart, float zStart, float dimensionSize)
 {
-    float x = xStart + 0.1f;
-    float y = yStart + 0.1f;
-    float z = zStart + 0.1f;
     const float kPositionStep = (dimensionSize - 0.2f) / kDimensions;
     for(unsigned int i = 0; i < kDimensions; ++i) //xy
     {
@@ -42,69 +39,19 @@ void myShape::draw(float tx, float ty, float scale, glm::mat4 view, const glm::m
     glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1000);
 }
 
+
 bool myShape::isCollision(glm::vec3 spherePosition, float sphereRay)
 {
-    sphereRay += 3;
-    bool firstCheckXY;
-    bool secondCheckXY;
-    bool thirdCheckXY;
-    bool firstCheckYZ;
-    bool secondCheckYZ;
-    bool thirdCheckYZ;
-    for(int i = 0; i < trianglesMidpoints.size(); ++i)
+    for(auto &triangle : triangleCache)
     {
-        std::vector<float> scaledTriangleVertices;
-        scaledTriangleVertices.resize(triangleVertices.size());
-        for(int j = 0; j < triangleVertices.size(); ++j)
+        glm::vec3 closestPoint = triangle.nearestPoint(spherePosition);
+        float length = glm::length(closestPoint - spherePosition);
+        if(length < sphereRay * 2)
         {
-            scaledTriangleVertices[j] = triangleVertices[j] * trianglesScales[i];
-            std::cout << triangleVertices[j] << " * " << trianglesScales[i] << " = " <<  scaledTriangleVertices[j] << std::endl;
+            std::cout << glm::to_string(closestPoint) << " sphere " <<glm::to_string(spherePosition) <<  "\n";
         }
-
-        for(int k = 0; k < triangleVertices.size(); k = k + 3)
-        {
-            //glm::vec3 tempVec = glm::rotate(glm::vec3(scaledTriangleVertices[0 + k], scaledTriangleVertices[1 + k], scaledTriangleVertices[2 + k]), glm::radians(trianglesAngles[i]), glm::vec3(1, 1, 1));
-            glm::vec3 tempVec = glm::vec3(scaledTriangleVertices[0 + k], scaledTriangleVertices[1 + k], scaledTriangleVertices[2 + k]);
-            tempVec *= trianglesMidpoints[i];
-            scaledTriangleVertices[0 + k] = tempVec.x;
-            scaledTriangleVertices[1 + k] = tempVec.y;
-            scaledTriangleVertices[2 + k] = tempVec.z;
-            std::cout << triangleVertices[k] << " * " << trianglesAngles[i] << " = " <<  scaledTriangleVertices[k] << " XXXXX " << std::endl;
-        }
-
-
-
-        glm::vec3 sphereTriangleVector = trianglesMidpoints[i] - spherePosition;
-        sphereTriangleVector = glm::normalize(sphereTriangleVector) * sphereRay;
-        sphereTriangleVector = sphereTriangleVector + spherePosition; //calculating endpoint position on the line between triangle and sphere midpoints
-
-        glm::vec2 A = glm::vec2(spherePosition.x, spherePosition.y); //casting to 2d xy space
-        glm::vec2 B = glm::vec2(sphereTriangleVector.x, sphereTriangleVector.y);
-
-        glm::vec2 C = glm::vec2(scaledTriangleVertices[0], scaledTriangleVertices[1]);
-        glm::vec2 D = glm::vec2(scaledTriangleVertices[3], scaledTriangleVertices[4]);
-        firstCheckXY = isIntersection(A, B, C, D); //check sphere-triangle line and 1, 2 triangle vertices
-        D = glm::vec2(scaledTriangleVertices[6], scaledTriangleVertices[7]);
-        secondCheckXY = isIntersection(A, B, C, D); //check sphere-triangle line and 1, 3 triangle vertices
-        C = glm::vec2(scaledTriangleVertices[3], scaledTriangleVertices[4]);
-        thirdCheckXY = isIntersection(A, B, C, D); //check sphere-triangle line and 2, 3 triangle vertices
-
-        A = glm::vec2(spherePosition.y, spherePosition.z); //casting to 2d yz space
-        B = glm::vec2(sphereTriangleVector.y, sphereTriangleVector.z);
-
-        C = glm::vec2(scaledTriangleVertices[1], scaledTriangleVertices[2]);
-        D = glm::vec2(scaledTriangleVertices[4], scaledTriangleVertices[5]);
-        firstCheckYZ = isIntersection(A, B, C, D); //check sphere-triangle line and 1, 2 triangle vertices
-        D = glm::vec2(scaledTriangleVertices[7], scaledTriangleVertices[8]);
-        secondCheckYZ = isIntersection(A, B, C, D); //check sphere-triangle line and 1, 3 triangle vertices
-        C = glm::vec2(scaledTriangleVertices[4], scaledTriangleVertices[5]);
-        thirdCheckYZ = isIntersection(A, B, C, D); //check sphere-triangle line and 2, 3 triangle vertices
-
-        if((firstCheckXY || secondCheckXY || thirdCheckXY) && (firstCheckYZ || secondCheckYZ || thirdCheckYZ))
-            std::cout <<"Dziala jak ta lala kurna" << std::endl;
     }
 }
-
 
 
 void myShape::setShaders()
@@ -138,7 +85,7 @@ void myShape::setBuffers()
     {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(trianglesMidpoints[i]));
-       // model = glm::rotate(model, glm::radians(trianglesAngles[i]), glm::vec3(1,1,1));
+        model = glm::rotate(model, glm::radians(trianglesAngles[i]), glm::vec3(1,1,1));
         matrixes.push_back(model);
     }
 
@@ -162,7 +109,7 @@ void myShape::setBuffers()
 
 void myShape::setRotations()
 {
-    for(int i = 0; i < kDimensions * kDimensions * kDimensions; ++i)
+    for(unsigned int i = 0; i < kDimensions * kDimensions * kDimensions; ++i)
     {
         trianglesAngles.push_back(angleDist(engine));
     }
@@ -170,31 +117,28 @@ void myShape::setRotations()
 
 void myShape::setScales()
 {
-    for(int i = 0; i < trianglesMidpoints.size(); ++i)
+    for(unsigned int i = 0; i < trianglesMidpoints.size(); ++i)
     {
         trianglesScales.push_back(scaleDist(engine));
     }
 }
 
-bool myShape::isIntersection(glm::vec2 A, glm::vec2 B, glm::vec2 C, glm::vec2 D)
+void myShape::setTriangleCache()
 {
-    GLfloat detABxAC = vectorProduct(A.x, A.y, B.x, B.y, C.x, C.y);
-    GLfloat detABxAD = vectorProduct(A.x, A.y, B.x, B.y, D.x, D.y);
-    GLfloat detCDxCA = vectorProduct(C.x, C.y, D.x, D.y, A.x, A.y);
-    GLfloat detCDxCB = vectorProduct(C.x, C.y, D.x, D.y, B.x, B.y);
-    if(detABxAC * detABxAD < 0 && detCDxCA * detCDxCB < 0)
+    for(unsigned int i = 0; i < trianglesMidpoints.size(); ++i)//creating model matrix
     {
-        return true;
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(trianglesMidpoints[i]));
+        model = glm::rotate(model, glm::radians(trianglesAngles[i]), glm::vec3(1,1,1));
+
+        glm::vec3 pointA = model * glm::vec4(glm::vec3(triangleVertices[0], triangleVertices[1], triangleVertices[2]) * trianglesScales[i], 1);
+        glm::vec3 pointB = model * glm::vec4(glm::vec3(triangleVertices[3], triangleVertices[4], triangleVertices[5]) * trianglesScales[i], 1);
+        glm::vec3 pointC = model * glm::vec4(glm::vec3(triangleVertices[6], triangleVertices[7], triangleVertices[8]) * trianglesScales[i], 1);
+        triangleCache.push_back(Triangle(pointA, pointB, pointC));
     }
-    return false;
 }
 
-float myShape::vectorProduct(float xA, float yA, float xB, float yB, float xC, float yC)
-{
-    GLfloat x1 = xB - xA;
-    GLfloat y1 = yB - yA;
-    GLfloat x2 = xC - xA;
-    GLfloat y2 = yC - yA;
-    return x1*y2 - x2*y1;
-}
+
+
+
 

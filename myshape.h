@@ -11,6 +11,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <AGL3Drawable.hpp>
+#include <triangle.h>
 
 
 #include <glm/gtx/string_cast.hpp>
@@ -21,28 +22,31 @@ public:
     void setMidpoints(float xStart, float yStart, float zStart, float dimensionSize);
     void draw(float tx, float ty, float scale, glm::mat4 view, const glm::mat4 &projection);
     bool isCollision(glm::vec3 spherePosition, float sphereRay);
+
 private:
     void setShaders();
     void setBuffers();
     void setRotations();
     void setScales();
+    void setTriangleCache();
+
     float vectorProduct(float xA, float yA, float xB, float yB, float xC, float yC);
     bool isIntersection(glm::vec2 A, glm::vec2 B, glm::vec2 C, glm::vec2 D);
     const unsigned int kDimensions;
-    std::mt19937 engine;
-    std::uniform_real_distribution<float> angleDist{0, 180.0f};
-    std::uniform_real_distribution<float> scaleDist{0, 1.0f};
     unsigned int VAO;
     unsigned int VBO;
     unsigned int midpointsVBO;
     unsigned int scalesVBO;
+    std::mt19937 engine;
+    std::uniform_real_distribution<float> angleDist{0, 180.0f};
+    std::uniform_real_distribution<float> scaleDist{1.0f, 3.0f};
     std::array<float, 9> triangleVertices = {0.0f   , 1.0f, 0.0f,
                                              0.5773f, 0.0f, 0.0f
                                             -0.5773f, 0.0f, 0.0f,
                                             };
 
 
-
+    std::vector<Triangle> triangleCache; //objects with precomputed collision parts
     std::vector<glm::vec3> trianglesMidpoints;
     std::vector<float> trianglesAngles;
     std::vector<float> trianglesScales;
