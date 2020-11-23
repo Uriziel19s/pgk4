@@ -13,14 +13,16 @@
 #include <memory>
 #include <array>
 #include <random>
-#include <AGL3Window.hpp>
-#include <myboard.h>
-#include <myline.h>
-#include <backgroundrectangle.h>
-#include <camera.h>
-#include <myshape.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
+
+#include "AGL3Window.hpp"
+#include "myboard.h"
+#include "myline.h"
+#include "backgroundrectangle.h"
+#include "camera.h"
+#include "myshape.h"
+#include "mysphere.h"
 
 
 // ==========================================================================
@@ -76,19 +78,21 @@ void MyWin::MousePosCB(double xp, double yp)
 }
 
 // ==========================================================================
-void MyWin::MainLoop(const int seed, const unsigned int dimensions) {
+void MyWin::MainLoop(int seed, unsigned int dimensions) {
     ViewportOne(0, 0, wd, ht);
     myShape shapes(10, 0);
+    mySphere sphere(4);
     float speed = 0.4;
     do {
         glClear( GL_COLOR_BUFFER_BIT );
-
+        sphere.updateSpherePosition(glm::vec3(0.0f, 0.0f, 0.0f));
         AGLErrors("main-loopbegin");
         // =====================================================        Drawing
         camera.updateView();
        // background.draw(0,0,2, camera.getView());
         shapes.isCollision(camera.getCameraPosition(), 4);
         shapes.draw(0, 0, 0.5, camera.getView(), camera.getProjection(wd, ht));
+        sphere.draw(camera.getView(), camera.getProjection(wd, ht), 5);
         AGLErrors("main-afterdraw");
         WaitForFixedFPS(1.0/60);
         glfwSwapBuffers(win()); // =============================   Swap buffers

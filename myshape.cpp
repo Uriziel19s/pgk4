@@ -29,7 +29,7 @@ void myShape::setMidpoints(float xStart, float yStart, float zStart, float dimen
     }
 }
 
-void myShape::draw(float tx, float ty, float scale, glm::mat4 view, const glm::mat4 &projection)
+void myShape::draw(float tx, float ty, float scale, const glm::mat4 &view, const glm::mat4 &projection)
 {
     bindProgram();
     glBindVertexArray(VAO);

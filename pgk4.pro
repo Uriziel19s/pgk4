@@ -13,7 +13,8 @@ SOURCES += \
     myboard.cpp \
     backgroundrectangle.cpp \
     camera.cpp \
-    myshape.cpp
+    myshape.cpp \
+    mysphere.cpp
 HEADERS += \
     AGL3Window.hpp \
     AGL3Drawable.hpp \
@@ -22,6 +23,9 @@ HEADERS += \
     backgroundrectangle.h \
     camera.h \
     myshape.h \
+    triangle.h \
+    mysphere.h \
     myShape.vs \
     myShape.fs \
-    triangle.h
+    MySphere.vs \
+    MySphere.fs

@@ -20,7 +20,7 @@ class myShape : public AGLDrawable
 public:
     myShape(unsigned int dimensions, int seed);
     void setMidpoints(float xStart, float yStart, float zStart, float dimensionSize);
-    void draw(float tx, float ty, float scale, glm::mat4 view, const glm::mat4 &projection);
+    void draw(float tx, float ty, float scale, const glm::mat4 &view, const glm::mat4 &projection);
     bool isCollision(glm::vec3 spherePosition, float sphereRay);
 
 private:
