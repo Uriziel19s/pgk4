@@ -25,6 +25,7 @@ public:
     mySphere(unsigned int numberOfDivides);
     void updateSpherePosition(const glm::vec3 &spherePosition);
     void draw(const glm::mat4 &view, const glm::mat4 &projection, float scale);
+    void setSpherePosition(const glm::vec3 &spherePosition);
 private:
     void generateTriangles(unsigned int numberOfDivides);
     void divideTriangles(const TriSphere &tri, unsigned int deep);

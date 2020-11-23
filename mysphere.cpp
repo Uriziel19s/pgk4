@@ -12,7 +12,7 @@ void mySphere::generateTriangles(unsigned int numberOfDivides)
     B *=5.0f;
     C *=5.0f;
     D *=5.0f;
-    centerOfSphere = glm::vec3(0.0f, 0.0f, sqrt(glm::pow(2.0f / 3.0f, 2.0f) + glm::pow(a, 2.0f)));
+    centerOfSphere = glm::vec3(0.0f, 0.0f, glm::sqrt(glm::pow(2.0f / 3.0f, 2.0f) + glm::pow(a, 2.0f)));
     divideTriangles(TriSphere(A, B, C), numberOfDivides);
     divideTriangles(TriSphere(A, B, D), numberOfDivides);
     divideTriangles(TriSphere(B, C, D), numberOfDivides);
@@ -28,12 +28,19 @@ mySphere::mySphere(unsigned int numberOfDivides)
     setBuffers();
 
 }
-
-void mySphere::updateSpherePosition(const glm::vec3 &spherePosition)
+void mySphere::setSpherePosition(const glm::vec3 &spherePosition)
 {
-        centerOfSphere = spherePosition;
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, spherePosition);
+    centerOfSphere = spherePosition;
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, spherePosition);
+    //std::cout << glm::to_string(spherePosition) << std::endl;
+}
+void mySphere::updateSpherePosition(const glm::vec3 &sphereMove)
+{
+    centerOfSphere += sphereMove;
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, centerOfSphere);
+   // std::cout << glm::to_string(sphereMOve) << std::endl;
 }
 
 void mySphere::divideTriangles(const TriSphere &tri, unsigned int deep)
@@ -68,7 +75,7 @@ void mySphere::normalizeDistanceToTriangles()
         triangle.A = glm::normalize(triangle.A - centerOfSphere)/5.0f;
         triangle.B = glm::normalize(triangle.B - centerOfSphere)/5.0f;
         triangle.C = glm::normalize(triangle.C - centerOfSphere)/5.0f;
-        std::cout << glm::to_string(triangle.A) << " " << glm::to_string(triangle.B) << " " << glm::to_string(triangle.C) << std::endl;
+       //std::cout << glm::to_string(triangle.A) << " " << glm::to_string(triangle.B) << " " << glm::to_string(triangle.C) << std::endl;
     }
 }
 
@@ -112,6 +119,4 @@ void mySphere::draw(const glm::mat4 &view, const glm::mat4 &projection, float sc
     glUniformMatrix4fv(2, 1, GL_FALSE, &model[0][0]);
     glUniform1f(3, scale);
     glDrawArrays(GL_TRIANGLES, 0, 3*trianglesPositions.size()+100);
-
-
 }

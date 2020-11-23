@@ -2,42 +2,32 @@
 
 Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 up) : cameraPosition(cameraPosition), cameraTarget(cameraTarget), up(up), worldUp(up)
 {
-    yaw = 120;
-    pitch = 0;
+    phi  = 0.0f;
+    theta = 0.0f;
     fov = 45;
-    rotateCamera(0, 0);
-    view = glm::lookAt(cameraPosition, cameraPosition + cameraTarget, up);
-
-
+    rotateRadius = 5.0f;
+    rotateCamera(phi, theta);
+    updateView();
 }
 
 void Camera::forwardBackwardMove(float speed)
 {
-    cameraPosition += glm::normalize(cameraTarget) * speed;
+    cameraTarget += glm::normalize(cameraTarget - cameraPosition) * speed;
+    cameraPosition += glm::normalize(cameraTarget - cameraPosition) * speed;
 }
 
-void Camera::rotateCamera(float pitch_t, float yaw_t)
+void Camera::rotateCamera(float tPhi, float tTheta)
 {
-    this->yaw += yaw_t;
-    this->pitch += pitch_t;
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
-    glm::vec3 front;
-    front.x = cosf(glm::radians(yaw)) * cosf(glm::radians(pitch));
-    front.y = sinf(glm::radians(pitch));
-    front.z = sinf(glm::radians(yaw)) * cosf(glm::radians(pitch));
-
-    cameraTarget = glm::normalize(front);
-
-    right = glm::normalize(glm::cross(cameraTarget, worldUp));
-    up = glm::normalize(glm::cross(right, cameraTarget));
+    phi  += tPhi;
+    theta += tTheta;
+    cameraPosition.x = cameraTarget.x + rotateRadius * glm::cos(glm::radians(phi)) * glm::cos(glm::radians(theta));
+    cameraPosition.y = cameraTarget.y + rotateRadius * glm::sin(glm::radians(phi));
+    cameraPosition.z = cameraTarget.z + rotateRadius * glm::cos(glm::radians(phi)) * glm::sin(glm::radians(theta));
 }
 
 void Camera::updateView()
 {
-    view = glm::lookAt(cameraPosition, cameraPosition + cameraTarget, up);
+    view = glm::lookAt(cameraPosition, cameraTarget, up);
 }
 
 void Camera::changeProjection(float yOffset)
@@ -47,7 +37,6 @@ void Camera::changeProjection(float yOffset)
         fov = 1.0f;
     if (fov > 45.0f)
         fov = 45.0f;
-
 }
 
 glm::mat4 Camera::getProjection(float screenWidth, float screenHeight)
@@ -55,8 +44,6 @@ glm::mat4 Camera::getProjection(float screenWidth, float screenHeight)
     projection = glm::perspective(glm::radians(fov), screenWidth / screenHeight, 1.0f, 50.0f);
     return projection;
 }
-
-
 
 glm::mat4 Camera::getView() const
 {
@@ -67,6 +54,13 @@ glm::vec3 Camera::getCameraPosition() const
 {
     return cameraPosition;
 }
+
+glm::vec3 Camera::getCameraTarget()
+{
+    return cameraTarget;
+}
+
+
 
 
 

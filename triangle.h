@@ -19,7 +19,7 @@ public:
         Edge3(glm::vec3 a, glm::vec3 b) : A(a), B(b), Delta(b - a), sqrtLength(glm::sqrt(glm::length(Delta))){}
         glm::vec3 pointAt(float t) const
         {
-            return A + Delta * t;
+            return A + t * Delta;
         }
         float lengthSquared() const
         {
@@ -89,17 +89,17 @@ public:
             return C;
         }
 
-        if(uAB > 0 && uAB < 1 && !planeAB.isAbove(p))
+        if(uAB >= 0 && uAB <= 1 && !planeAB.isAbove(p))
         {
             return edgeAB.pointAt(uAB);
         }
 
-        if(uBC > 0 && uBC < 1 && !planeBC.isAbove(p))
+        if(uBC >= 0 && uBC <= 1 && !planeBC.isAbove(p))
         {
             return edgeBC.pointAt(uBC);
         }
 
-        if(uCA > 0 && uCA < 1 && !planeCA.isAbove(p))
+        if(uCA >= 0 && uCA <= 1 && !planeCA.isAbove(p))
         {
             return edgeCA.pointAt(uCA);
         }

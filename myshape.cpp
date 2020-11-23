@@ -36,7 +36,7 @@ void myShape::draw(float tx, float ty, float scale, const glm::mat4 &view, const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUniformMatrix4fv(0, 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(1, 1, GL_FALSE, &projection[0][0]);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1000);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 3, trianglesMidpoints.size());
 }
 
 
@@ -46,11 +46,15 @@ bool myShape::isCollision(glm::vec3 spherePosition, float sphereRay)
     {
         glm::vec3 closestPoint = triangle.nearestPoint(spherePosition);
         float length = glm::length(closestPoint - spherePosition);
-        if(length < sphereRay * 2)
+        if(length < sphereRay)
         {
+            float a = glm::dot(spherePosition - closestPoint, triangle.A - closestPoint);
+            std::cout << length << std::endl;
             std::cout << glm::to_string(closestPoint) << " sphere " <<glm::to_string(spherePosition) <<  "\n";
+            return true;
         }
     }
+    return false;
 }
 
 

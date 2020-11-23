@@ -80,45 +80,81 @@ void MyWin::MousePosCB(double xp, double yp)
 // ==========================================================================
 void MyWin::MainLoop(int seed, unsigned int dimensions) {
     ViewportOne(0, 0, wd, ht);
-    myShape shapes(10, 0);
+    myShape shapes(2, 0);
     mySphere sphere(4);
-    float speed = 0.4;
+    float speed = 0.2;
+    //camera.setMainPont(glm::vec3(0.0f, 0.0f, 0.0f));
+    sphere.setSpherePosition(glm::vec3(0.0f, 0.0f, 0.0f));
     do {
         glClear( GL_COLOR_BUFFER_BIT );
-        sphere.updateSpherePosition(glm::vec3(0.0f, 0.0f, 0.0f));
         AGLErrors("main-loopbegin");
         // =====================================================        Drawing
         camera.updateView();
-       // background.draw(0,0,2, camera.getView());
-        shapes.isCollision(camera.getCameraPosition(), 4);
-        shapes.draw(0, 0, 0.5, camera.getView(), camera.getProjection(wd, ht));
-        sphere.draw(camera.getView(), camera.getProjection(wd, ht), 5);
+        shapes.draw(0, 0, 1, camera.getView(), camera.getProjection(wd, ht));
+        sphere.draw(camera.getView(), camera.getProjection(wd, ht), 1);
         AGLErrors("main-afterdraw");
         WaitForFixedFPS(1.0/60);
         glfwSwapBuffers(win()); // =============================   Swap buffers
         glfwPollEvents();
         //glfwWaitEvents();
+        shapes.isCollision(camera.getCameraTarget(), 0.2);
 
 
-        if (glfwGetKey(win(), GLFW_KEY_DOWN ) == GLFW_PRESS) {
+
+
+
+
+
+
+
+        if (glfwGetKey(win(), GLFW_KEY_DOWN ) == GLFW_PRESS)
+        {
             camera.rotateCamera(-speed,0);
+            //sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
         }
-        if (glfwGetKey(win(), GLFW_KEY_UP ) == GLFW_PRESS) {
+        if (glfwGetKey(win(), GLFW_KEY_UP ) == GLFW_PRESS)
+        {
             camera.rotateCamera(speed,0);
-        }  if (glfwGetKey(win(), GLFW_KEY_RIGHT ) == GLFW_PRESS) {
+           // sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
+        }
+        if (glfwGetKey(win(), GLFW_KEY_RIGHT ) == GLFW_PRESS)
+        {
             camera.rotateCamera(0,speed);
-        } if (glfwGetKey(win(), GLFW_KEY_LEFT ) == GLFW_PRESS) {
+            //sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
+        }
+        if (glfwGetKey(win(), GLFW_KEY_LEFT ) == GLFW_PRESS)
+        {
             camera.rotateCamera(0,-speed);
-        } if (glfwGetKey(win(), GLFW_KEY_W ) == GLFW_PRESS) {
-                camera.forwardBackwardMove(-speed);
-        } if (glfwGetKey(win(), GLFW_KEY_S ) == GLFW_PRESS) {
+          //  sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
+        }
+        if (glfwGetKey(win(), GLFW_KEY_W ) == GLFW_PRESS)
+        {
+            camera.forwardBackwardMove(-speed);
+            if(shapes.isCollision(camera.getCameraTarget(), 0.2f))
+            {
             camera.forwardBackwardMove(speed);
-        } if (glfwGetKey(win(), GLFW_KEY_A ) == GLFW_PRESS) {
+            }
+            sphere.setSpherePosition(camera.getCameraTarget());
 
-        } if (glfwGetKey(win(), GLFW_KEY_D ) == GLFW_PRESS) {
-        std::cout << glm::to_string(camera.getCameraPosition()) << std::endl;
 
         }
+        if (glfwGetKey(win(), GLFW_KEY_S ) == GLFW_PRESS)
+        {
+            camera.forwardBackwardMove(speed);
+            if(shapes.isCollision(camera.getCameraTarget(), 0.2f))
+            {
+            camera.forwardBackwardMove(-speed);
+            }
+            sphere.setSpherePosition(camera.getCameraTarget());
+        }
+        if (glfwGetKey(win(), GLFW_KEY_A ) == GLFW_PRESS)
+        {
+            speed=0.4;
+        } if (glfwGetKey(win(), GLFW_KEY_D ) == GLFW_PRESS)
+        {
+            speed = 0.01;
+        }
+
     } while( glfwGetKey(win(), GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
              glfwWindowShouldClose(win()) == 0 );
 }
