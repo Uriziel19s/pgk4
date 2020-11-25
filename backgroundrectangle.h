@@ -13,12 +13,59 @@
 class BackgroundRectangle : public AGLDrawable
 {
 public:
-    BackgroundRectangle(GLfloat xStart, GLfloat yStart, GLfloat xEnd, GLfloat yEnd);
+    BackgroundRectangle(glm::vec3 centerOfCube);
     void setShaders();
     void setBuffers();
-    void draw(float tx, float ty, float scale, glm::mat4 view);
+    void draw(float scale, const glm::mat4 &view, const glm::mat4 projection);
 private:
-    std::array<std::array<GLfloat,2>, 6> vert;
+    glm::vec3 centerOfCUbe;
+    glm::mat4 model;
+    std::array<float, 108> cubeVertices = {
+
+                -0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f,  0.5f, -0.5f,
+                 0.5f,  0.5f, -0.5f,
+                -0.5f,  0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
+
+                -0.5f, -0.5f,  0.5f,
+                 0.5f, -0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,
+
+                -0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f,  0.5f,
+                -0.5f,  0.5f,  0.5f,
+
+                 0.5f,  0.5f,  0.5f,
+                 0.5f,  0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
+
+                -0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f,  0.5f,
+                 0.5f, -0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,
+                -0.5f, -0.5f, -0.5f,
+
+                -0.5f,  0.5f, -0.5f,
+                 0.5f,  0.5f, -0.5f,
+                 0.5f,  0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f, -0.5f,
+
+
+    };
 };
 
 #endif // BACKGROUNDRECTANGLE_H

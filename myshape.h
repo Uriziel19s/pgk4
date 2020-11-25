@@ -22,6 +22,7 @@ public:
     void setMidpoints(float xStart, float yStart, float zStart, float dimensionSize);
     void draw(float tx, float ty, float scale, const glm::mat4 &view, const glm::mat4 &projection);
     bool isCollision(glm::vec3 spherePosition, float sphereRay);
+    bool isFinalCollision(glm::vec3 spherePosition, float sphereRay, unsigned int finalTriangleIndex);
 
 private:
     void setShaders();

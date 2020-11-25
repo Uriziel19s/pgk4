@@ -108,7 +108,6 @@ void MyLine::setPosition(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2)
     vert[0][1] = y1;
     vert[1][0] = x2;
     vert[1][1] = y2;
-    //this->draw(0,0,1);
     setBuffers();
 }
 

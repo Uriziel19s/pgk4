@@ -33,14 +33,14 @@ void mySphere::setSpherePosition(const glm::vec3 &spherePosition)
     centerOfSphere = spherePosition;
     model = glm::mat4(1.0f);
     model = glm::translate(model, spherePosition);
-    //std::cout << glm::to_string(spherePosition) << std::endl;
 }
+
+
 void mySphere::updateSpherePosition(const glm::vec3 &sphereMove)
 {
     centerOfSphere += sphereMove;
     model = glm::mat4(1.0f);
     model = glm::translate(model, centerOfSphere);
-   // std::cout << glm::to_string(sphereMOve) << std::endl;
 }
 
 void mySphere::divideTriangles(const TriSphere &tri, unsigned int deep)
@@ -75,7 +75,6 @@ void mySphere::normalizeDistanceToTriangles()
         triangle.A = glm::normalize(triangle.A - centerOfSphere)/5.0f;
         triangle.B = glm::normalize(triangle.B - centerOfSphere)/5.0f;
         triangle.C = glm::normalize(triangle.C - centerOfSphere)/5.0f;
-       //std::cout << glm::to_string(triangle.A) << " " << glm::to_string(triangle.B) << " " << glm::to_string(triangle.C) << std::endl;
     }
 }
 

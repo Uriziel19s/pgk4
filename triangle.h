@@ -14,20 +14,20 @@ public:
         const glm::vec3 A;
         const glm::vec3 B;
         const glm::vec3 Delta;
-        const float sqrtLength;
+        const float squaredLength;
 
-        Edge3(glm::vec3 a, glm::vec3 b) : A(a), B(b), Delta(b - a), sqrtLength(glm::sqrt(glm::length(Delta))){}
+        Edge3(glm::vec3 a, glm::vec3 b) : A(a), B(b), Delta(b - a), squaredLength(glm::pow(glm::length(Delta), 2)){}
         glm::vec3 pointAt(float t) const
         {
             return A + t * Delta;
         }
         float lengthSquared() const
         {
-            return sqrtLength;
+            return squaredLength;
         }
         float project(glm::vec3 p) const
         {
-            return glm::dot(p - A, Delta) / sqrtLength;
+            return glm::dot(p - A, Delta) / squaredLength;
         }
 
     };
@@ -45,8 +45,8 @@ public:
 
         glm::vec3 project(glm::vec3 p) const
         {
-            glm::vec3 normalizedDirecion = Direction/glm::length(Direction);
-            return p - (glm::dot(p, normalizedDirecion) - glm::dot(Point, normalizedDirecion)) *normalizedDirecion;
+            glm::vec3 normalizedDirecion = Direction / glm::length(Direction);
+            return p - (glm::dot(p, normalizedDirecion) - glm::dot(Point, normalizedDirecion)) * normalizedDirecion;
         }
     };
     const glm::vec3 A;

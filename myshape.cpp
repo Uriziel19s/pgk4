@@ -7,7 +7,7 @@ myShape::myShape(unsigned int dimensions, int seed) : kDimensions(dimensions), e
         engine.seed(static_cast<unsigned long>(seed));
     }
     setShaders();
-    setMidpoints(-15, -15, 15, 15);
+    setMidpoints(0, 0, 15, 15);
     setRotations();
     setScales();
     setBuffers();
@@ -33,7 +33,6 @@ void myShape::draw(float tx, float ty, float scale, const glm::mat4 &view, const
 {
     bindProgram();
     glBindVertexArray(VAO);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUniformMatrix4fv(0, 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(1, 1, GL_FALSE, &projection[0][0]);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 3, trianglesMidpoints.size());
@@ -42,20 +41,33 @@ void myShape::draw(float tx, float ty, float scale, const glm::mat4 &view, const
 
 bool myShape::isCollision(glm::vec3 spherePosition, float sphereRay)
 {
+    int i = 0;
     for(auto &triangle : triangleCache)
     {
         glm::vec3 closestPoint = triangle.nearestPoint(spherePosition);
         float length = glm::length(closestPoint - spherePosition);
         if(length < sphereRay)
         {
-            float a = glm::dot(spherePosition - closestPoint, triangle.A - closestPoint);
-            std::cout << length << std::endl;
-            std::cout << glm::to_string(closestPoint) << " sphere " <<glm::to_string(spherePosition) <<  "\n";
             return true;
         }
     }
     return false;
 }
+
+bool myShape::isFinalCollision(glm::vec3 spherePosition, float sphereRay, unsigned int finalTriangleIndex)
+{
+
+        glm::vec3 closestPoint = triangleCache.at(finalTriangleIndex).nearestPoint(spherePosition);
+        float length = glm::length(closestPoint - spherePosition);
+        std::cout << "xyz " << glm::to_string(triangleCache[finalTriangleIndex].A) << std::endl;
+        if(length < sphereRay)
+        {
+            return true;
+        }
+
+        return false;
+}
+
 
 
 void myShape::setShaders()

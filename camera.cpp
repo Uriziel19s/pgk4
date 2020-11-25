@@ -8,6 +8,9 @@ Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 up) :
     rotateRadius = 5.0f;
     rotateCamera(phi, theta);
     updateView();
+   // theta = -90;
+    rotateCamera(phi, theta);
+    updateView();
 }
 
 void Camera::forwardBackwardMove(float speed)
@@ -18,6 +21,7 @@ void Camera::forwardBackwardMove(float speed)
 
 void Camera::rotateCamera(float tPhi, float tTheta)
 {
+    std::cout << phi << " " << theta << std::endl;
     phi  += tPhi;
     theta += tTheta;
     cameraPosition.x = cameraTarget.x + rotateRadius * glm::cos(glm::radians(phi)) * glm::cos(glm::radians(theta));
@@ -41,7 +45,7 @@ void Camera::changeProjection(float yOffset)
 
 glm::mat4 Camera::getProjection(float screenWidth, float screenHeight)
 {
-    projection = glm::perspective(glm::radians(fov), screenWidth / screenHeight, 1.0f, 50.0f);
+    projection = glm::perspective(glm::radians(fov), screenWidth / screenHeight, 1.0f, 100.0f);
     return projection;
 }
 

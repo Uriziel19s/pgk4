@@ -46,12 +46,21 @@ public:
     void MainLoop(const int seed, const unsigned int dimensions);
     void ScrollCB(double xp, double yp);
     void MousePosCB(double xp, double yp);
-    Camera camera{glm::vec3(0.0f, 5.0f, 0.0f),
-                  glm::vec3(0.0f, 0.0f, 0.0f),
+    void display();
+    Camera camera{glm::vec3(0.0f, 0.0f, 0.0f),
+                  glm::vec3(20.0f, 15.0f, 15.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f)};
+    Camera camera2{glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f, 1.0f, 1.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f)};
+
 
 };
 
+void MyWin::display()
+{
+
+}
 
 
 // ==========================================================================
@@ -80,30 +89,35 @@ void MyWin::MousePosCB(double xp, double yp)
 // ==========================================================================
 void MyWin::MainLoop(int seed, unsigned int dimensions) {
     ViewportOne(0, 0, wd, ht);
-    myShape shapes(2, 0);
+    myShape shapes(10, 0);
     mySphere sphere(4);
-    float speed = 0.2;
-    //camera.setMainPont(glm::vec3(0.0f, 0.0f, 0.0f));
-    sphere.setSpherePosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    BackgroundRectangle background(glm::vec3(7.5f, 7.5f, 7.5f));
+    float sphereRay = 0.2f;
+    float speed = 0.2f;
+    unsigned int indexOfFinalTriangle = 9;
+    sphere.setSpherePosition(camera.getCameraTarget());
     do {
-        glClear( GL_COLOR_BUFFER_BIT );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         AGLErrors("main-loopbegin");
         // =====================================================        Drawing
         camera.updateView();
         shapes.draw(0, 0, 1, camera.getView(), camera.getProjection(wd, ht));
         sphere.draw(camera.getView(), camera.getProjection(wd, ht), 1);
+        background.draw(80, camera.getView(), camera.getProjection(wd, ht));
         AGLErrors("main-afterdraw");
         WaitForFixedFPS(1.0/60);
         glfwSwapBuffers(win()); // =============================   Swap buffers
         glfwPollEvents();
         //glfwWaitEvents();
-        shapes.isCollision(camera.getCameraTarget(), 0.2);
+
+//        ViewportOne(0, 0, 100, 100);
+//        camera2.updateView();
+//        shapes.draw(0, 0, 1, camera2.getView(), camera2.getProjection(100, 100));
+//        sphere.draw(camera2.getView(), camera2.getProjection(100, 100), 1);
+//        glfwSwapBuffers(win()); // =============================   Swap buffers
 
 
-
-
-
-
+        std::cout << glm::to_string(camera.getCameraTarget()) << std::endl;
 
 
 
@@ -130,7 +144,11 @@ void MyWin::MainLoop(int seed, unsigned int dimensions) {
         if (glfwGetKey(win(), GLFW_KEY_W ) == GLFW_PRESS)
         {
             camera.forwardBackwardMove(-speed);
-            if(shapes.isCollision(camera.getCameraTarget(), 0.2f))
+            if(shapes.isFinalCollision(camera.getCameraTarget(), sphereRay, indexOfFinalTriangle))
+            {
+                return;
+            }
+            if(shapes.isCollision(camera.getCameraTarget(), sphereRay))
             {
             camera.forwardBackwardMove(speed);
             }
@@ -141,19 +159,24 @@ void MyWin::MainLoop(int seed, unsigned int dimensions) {
         if (glfwGetKey(win(), GLFW_KEY_S ) == GLFW_PRESS)
         {
             camera.forwardBackwardMove(speed);
-            if(shapes.isCollision(camera.getCameraTarget(), 0.2f))
+            if(shapes.isFinalCollision(camera.getCameraTarget(), sphereRay, indexOfFinalTriangle))
             {
-            camera.forwardBackwardMove(-speed);
+                return;
+            }
+            if(shapes.isCollision(camera.getCameraTarget(), sphereRay))
+            {
+                camera.forwardBackwardMove(-speed);
             }
             sphere.setSpherePosition(camera.getCameraTarget());
         }
         if (glfwGetKey(win(), GLFW_KEY_A ) == GLFW_PRESS)
         {
-            speed=0.4;
+            speed=0.8;
         } if (glfwGetKey(win(), GLFW_KEY_D ) == GLFW_PRESS)
         {
-            speed = 0.01;
+            speed = 0.4;
         }
+
 
     } while( glfwGetKey(win(), GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
              glfwWindowShouldClose(win()) == 0 );
