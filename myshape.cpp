@@ -4,10 +4,10 @@ myShape::myShape(unsigned int dimensions, int seed) : kDimensions(dimensions), e
 {
     if(seed != 0)
     {
-        engine.seed(static_cast<unsigned long>(seed));
+        engine.seed(static_cast<unsigned long>(glm::abs(seed)));
     }
     setShaders();
-    setMidpoints(0, 0, 15, 15);
+    setMidpoints(0, 0, 0, 15);
     setRotations();
     setScales();
     setBuffers();
@@ -17,9 +17,9 @@ myShape::myShape(unsigned int dimensions, int seed) : kDimensions(dimensions), e
 void myShape::setMidpoints(float xStart, float yStart, float zStart, float dimensionSize)
 {
     const float kPositionStep = (dimensionSize - 0.2f) / kDimensions;
-    for(unsigned int i = 0; i < kDimensions; ++i) //xy
+    for(unsigned int i = 0; i < kDimensions; ++i)
     {
-        for(unsigned int j = 0; j < kDimensions; ++j)//y
+        for(unsigned int j = 0; j < kDimensions; ++j)
         {
             for(unsigned int k = 0; k < kDimensions; ++k)
             {
@@ -48,8 +48,10 @@ bool myShape::isCollision(glm::vec3 spherePosition, float sphereRay)
         float length = glm::length(closestPoint - spherePosition);
         if(length < sphereRay)
         {
+            std::cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" << i << std::endl;
             return true;
         }
+        i++;
     }
     return false;
 }
@@ -66,6 +68,16 @@ bool myShape::isFinalCollision(glm::vec3 spherePosition, float sphereRay, unsign
         }
 
         return false;
+}
+
+unsigned int myShape::getLastTriangleIndex()
+{
+    return (trianglesMidpoints.size() - 1);
+}
+
+glm::vec3 myShape::getLasTrianglePosition()
+{
+    return trianglesMidpoints.back();
 }
 
 

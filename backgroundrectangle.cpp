@@ -13,6 +13,7 @@ void BackgroundRectangle::setShaders()
 {
     compileShaders(R"END(
 
+
                    #version 330
                    #extension GL_ARB_explicit_uniform_location : require
                    #extension GL_ARB_shading_language_420pack : require
@@ -22,16 +23,18 @@ void BackgroundRectangle::setShaders()
                    layout(location = 1) uniform mat4  projection;
                    layout(location = 2) uniform mat4  view;
                    layout(location = 3) uniform mat4  model;
+                   layout(location = 4) uniform float playerDistance;
                    out vec3 vColor;
 
                    void main(void)
                    {
-                       vec4 temp = model * vec4(aPos * scale, 1.0f);
+                       vec4 temp = model * (vec4(aPos * scale, 1.0f));
                        float len = length(temp);
-                       vColor = vec3(abs((temp.x / len)), abs((temp.y / len)), abs((temp.z / len)));
+                       vColor = vec3(abs(temp.x / len)/2 / playerDistance, abs(temp.y / len)/2 / playerDistance, abs(temp.z / len)/2 / playerDistance);
                        gl_Position =  projection * view * model * vec4(aPos * scale, 1.0f);
 
                    }
+
 
                    )END", R"END(
 
@@ -66,7 +69,7 @@ void BackgroundRectangle::setBuffers()
 }
 
 
-void BackgroundRectangle::draw(float scale, const glm::mat4 &view, const glm::mat4 projection)
+void BackgroundRectangle::draw(float scale, const glm::mat4 &view, const glm::mat4 projection, float playerNormalizedDistance)
 {
     bindProgram();
     bindBuffers();
@@ -74,6 +77,6 @@ void BackgroundRectangle::draw(float scale, const glm::mat4 &view, const glm::ma
     glUniformMatrix4fv(1, 1, GL_FALSE, &projection[0][0]);
     glUniformMatrix4fv(2, 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(3, 1, GL_FALSE, &model[0][0]);
-
+    glUniform1f(4, playerNormalizedDistance);
     glDrawArrays(GL_TRIANGLES, 0, cubeVertices.size());
 }

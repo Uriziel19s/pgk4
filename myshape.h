@@ -23,7 +23,8 @@ public:
     void draw(float tx, float ty, float scale, const glm::mat4 &view, const glm::mat4 &projection);
     bool isCollision(glm::vec3 spherePosition, float sphereRay);
     bool isFinalCollision(glm::vec3 spherePosition, float sphereRay, unsigned int finalTriangleIndex);
-
+    unsigned int getLastTriangleIndex();
+    glm::vec3 getLasTrianglePosition();
 private:
     void setShaders();
     void setBuffers();
@@ -40,7 +41,7 @@ private:
     unsigned int scalesVBO;
     std::mt19937 engine;
     std::uniform_real_distribution<float> angleDist{0, 180.0f};
-    std::uniform_real_distribution<float> scaleDist{1.0f, 3.0f};
+    std::uniform_real_distribution<float> scaleDist{0.6f, 1.0f};
     std::array<float, 9> triangleVertices = {0.0f   , 1.0f, 0.0f,
                                              0.5773f, 0.0f, 0.0f
                                             -0.5773f, 0.0f, 0.0f,

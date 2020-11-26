@@ -12,7 +12,7 @@ void main(void)
 	{
             vec4 temp = model * vec4(aPos * scale, 1.0f);
             float len = length(temp);
-            vColor = vec3(abs(temp.x / len), abs(temp.y / len), abs(temp.z / len));
+            vColor = vec3(abs(temp.x / len), abs(temp.y / len), abs((temp.z + 15) / len));
             gl_Position =  projection * view * model * vec4(aPos * scale, 1.0f);
 
         }

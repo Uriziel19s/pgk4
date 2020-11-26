@@ -16,7 +16,7 @@ public:
     BackgroundRectangle(glm::vec3 centerOfCube);
     void setShaders();
     void setBuffers();
-    void draw(float scale, const glm::mat4 &view, const glm::mat4 projection);
+    void draw(float scale, const glm::mat4 &view, const glm::mat4 projection, float playerNormalizedDistance);
 private:
     glm::vec3 centerOfCUbe;
     glm::mat4 model;

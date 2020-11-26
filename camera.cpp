@@ -8,7 +8,6 @@ Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 up) :
     rotateRadius = 5.0f;
     rotateCamera(phi, theta);
     updateView();
-   // theta = -90;
     rotateCamera(phi, theta);
     updateView();
 }
@@ -24,6 +23,23 @@ void Camera::rotateCamera(float tPhi, float tTheta)
     std::cout << phi << " " << theta << std::endl;
     phi  += tPhi;
     theta += tTheta;
+    if(phi > 89.0f)
+    {
+        phi = 89.0f;
+    }
+    else if(phi < -89.0f)
+    {
+        phi = -89.0f;
+    }
+
+    if(theta > 360.0f)
+    {
+        theta = theta - 360.0f;
+    }
+    else if(theta < 0)
+    {
+        theta = 360 + theta;
+    }
     cameraPosition.x = cameraTarget.x + rotateRadius * glm::cos(glm::radians(phi)) * glm::cos(glm::radians(theta));
     cameraPosition.y = cameraTarget.y + rotateRadius * glm::sin(glm::radians(phi));
     cameraPosition.z = cameraTarget.z + rotateRadius * glm::cos(glm::radians(phi)) * glm::sin(glm::radians(theta));

@@ -59,7 +59,7 @@ void AGLWindow::Resize(int xpos, int ypos, int _wd, int _ht )
    wd = _wd;
    ht = _ht;
    aspect= float(ht) / float(wd);
-   ViewportOne(xpos, ypos, static_cast<GLsizei>(_wd), (GLsizei) _ht);
+   Viewport(xpos, ypos, static_cast<GLsizei>(_wd), (GLsizei) _ht);
 }
 
 void AGLWindow::KeyCB(int key, int scancode, int action, int mods)
@@ -169,6 +169,7 @@ void AGLWindow::CallbackResize(GLFWwindow* window, int cx, int cy)
    void *ptr = glfwGetWindowUserPointer(window);
    if (AGLWindow *winPtr = static_cast<AGLWindow*>(ptr))
       winPtr->Resize((cx - cy) / 2, 0, cy, cy );
+   std::cout << cx << " " << cy << " " << (cx - cy) / 2 << std::endl;
 }
 
 void AGLWindow::CallbackKey(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -220,6 +221,4 @@ void AGLWindow::SetFullScreen(bool fullscreen)
       glfwSetWindowMonitor(window, nullptr, winPos[0], winPos[1], winSize[0], winSize[1], 0);
       glfwShowWindow(window);
    }
-   glfwGetFramebufferSize(window, &wd, &ht);
-   Resize(0, 0, wd, ht);
 }

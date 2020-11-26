@@ -39,22 +39,24 @@
 
 class MyWin : public AGLWindow {
 public:
-    MyWin() {};
+    MyWin() {}
     MyWin(int _wd, int _ht, const char *name, int vers, int fullscr=0)
-        : AGLWindow(_wd, _ht, name, vers, fullscr) {};
+        : AGLWindow(_wd, _ht, name, vers, fullscr), lastMouseXPosition(_wd / 2.0f), lastMouseYPosition(_ht / 2.0f) {};
     virtual void KeyCB(int key, int scancode, int action, int mods);
     void MainLoop(const int seed, const unsigned int dimensions);
     void ScrollCB(double xp, double yp);
     void MousePosCB(double xp, double yp);
     void display();
+private:
     Camera camera{glm::vec3(0.0f, 0.0f, 0.0f),
-                  glm::vec3(20.0f, 15.0f, 15.0f),
+                  glm::vec3(-3.0f, -3.0f, -3.0f),
                   glm::vec3(0.0f, 1.0f, 0.0f)};
     Camera camera2{glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f, 1.0f, 1.0f),
-                glm::vec3(0.0f, 1.0f, 0.0f)};
-
-
+                glm::vec3(7.5f, 25.0f, 7.5f),
+    glm::vec3(0.0f, 1.0f, 0.0f)};
+    float lastMouseXPosition;
+    float lastMouseYPosition;
+    float mouseSensivity = 0.1f;
 };
 
 void MyWin::display()
@@ -83,63 +85,79 @@ void MyWin::ScrollCB(double xp, double yp)
 
 void MyWin::MousePosCB(double xp, double yp)
 {
-
+    camera.rotateCamera(-(lastMouseYPosition - yp) * mouseSensivity, -(lastMouseXPosition - xp) * mouseSensivity);
+    lastMouseXPosition = xp;
+    lastMouseYPosition = yp;
+    camera.updateView();
 }
 
 // ==========================================================================
 void MyWin::MainLoop(int seed, unsigned int dimensions) {
+    glfwSetInputMode(win(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     ViewportOne(0, 0, wd, ht);
-    myShape shapes(10, 0);
+    myShape shapes(dimensions, seed);
     mySphere sphere(4);
     BackgroundRectangle background(glm::vec3(7.5f, 7.5f, 7.5f));
+    camera.rotateCamera(-70, 180);
+    camera.updateView();
+    camera2.rotateCamera(89.0f, 0.0f);
+    camera2.updateView();
     float sphereRay = 0.2f;
     float speed = 0.2f;
-    unsigned int indexOfFinalTriangle = 9;
+    int  minimapWd = 200;
+    int  minimapHt = 200;
+    bool showMap = false;
+    unsigned int indexOfFinalTriangle = shapes.getLastTriangleIndex();
+    const float startToEndDistance = glm::length(shapes.getLasTrianglePosition() - camera.getCameraTarget());
     sphere.setSpherePosition(camera.getCameraTarget());
     do {
+    //Viewport(0, 0, wd, ht);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         AGLErrors("main-loopbegin");
         // =====================================================        Drawing
         camera.updateView();
         shapes.draw(0, 0, 1, camera.getView(), camera.getProjection(wd, ht));
         sphere.draw(camera.getView(), camera.getProjection(wd, ht), 1);
-        background.draw(80, camera.getView(), camera.getProjection(wd, ht));
+        background.draw(80, camera.getView(), camera.getProjection(minimapWd, minimapHt), glm::length(shapes.getLasTrianglePosition() - camera.getCameraTarget()) / startToEndDistance);
         AGLErrors("main-afterdraw");
         WaitForFixedFPS(1.0/60);
-        glfwSwapBuffers(win()); // =============================   Swap buffers
+      //  glfwSwapBuffers(win()); // =============================   Swap buffers
         glfwPollEvents();
         //glfwWaitEvents();
+        if(showMap)
+        {
+        glScissor(0, 0, minimapWd, minimapHt);
+        glEnable(GL_SCISSOR_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDisable(GL_SCISSOR_TEST);
+        Viewport(0, 0, minimapWd, minimapHt);
+        camera2.updateView();
+        shapes.draw(0, 0, 1, camera2.getView(), camera2.getProjection(minimapWd, minimapHt));
+        sphere.draw(camera2.getView(), camera2.getProjection(minimapWd, minimapHt), 1);
+        background.draw(80, camera2.getView(), camera2.getProjection(minimapWd, minimapHt), glm::length(shapes.getLasTrianglePosition() - camera.getCameraTarget()) / startToEndDistance );
+         }
+        glfwSwapBuffers(win()); // =============================   Swap buffers
 
-//        ViewportOne(0, 0, 100, 100);
-//        camera2.updateView();
-//        shapes.draw(0, 0, 1, camera2.getView(), camera2.getProjection(100, 100));
-//        sphere.draw(camera2.getView(), camera2.getProjection(100, 100), 1);
-//        glfwSwapBuffers(win()); // =============================   Swap buffers
 
-
-        std::cout << glm::to_string(camera.getCameraTarget()) << std::endl;
+        //std::cout << glm::to_string(camera.getCameraTarget()) << std::endl;
 
 
 
         if (glfwGetKey(win(), GLFW_KEY_DOWN ) == GLFW_PRESS)
         {
             camera.rotateCamera(-speed,0);
-            //sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
         }
         if (glfwGetKey(win(), GLFW_KEY_UP ) == GLFW_PRESS)
         {
             camera.rotateCamera(speed,0);
-           // sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
         }
         if (glfwGetKey(win(), GLFW_KEY_RIGHT ) == GLFW_PRESS)
         {
             camera.rotateCamera(0,speed);
-            //sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
         }
         if (glfwGetKey(win(), GLFW_KEY_LEFT ) == GLFW_PRESS)
         {
             camera.rotateCamera(0,-speed);
-          //  sphere.setSpherePosition(camera.getCameraPosition() + camera.getCameraTarget() * distanceCameraSphere);
         }
         if (glfwGetKey(win(), GLFW_KEY_W ) == GLFW_PRESS)
         {
@@ -175,6 +193,16 @@ void MyWin::MainLoop(int seed, unsigned int dimensions) {
         } if (glfwGetKey(win(), GLFW_KEY_D ) == GLFW_PRESS)
         {
             speed = 0.4;
+        }if (glfwGetKey(win(), GLFW_KEY_M ) == GLFW_PRESS)
+        {
+            if(!showMap)
+            {
+                showMap = true;
+            }
+            else
+            {
+                showMap = false;
+            }
         }
 
 
